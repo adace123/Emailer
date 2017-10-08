@@ -17,7 +17,6 @@
     "express": "^4.15.4",
     "express-fileupload": "^0.2.0",
     "express-session": "^1.15.5",
-    "flat": "^4.0.0",
     "mongoose": "^4.11.12",
     "nodemailer": "^4.1.0",
     "nodemon": "^1.12.1",
