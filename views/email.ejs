@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>Emailer</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="https://unpkg.com/jquery@3.2.1/dist/jquery.js"></script>
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="https://unpkg.com/vue"></script>
+    <script src="js/index.js"></script>
+    <script src="components/navbar.js"></script>
+    <script src="components/emailForm.js"></script>
+    <script src="components/contactList.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.16.2/axios.min.js"></script>
+  </head>
+  <body>
+    <div id="main">
+        <navbar @emailsent="loadComponent('contact-list')" @createemail="loadComponent('email-form')" :user-email="user.email" :logout="logout" :email-form="emailForm" :contact-list="contactList"></navbar>
+        <div class="container">
+          <div class="row">
+            <div class="col s6 offset-s3">
+                <component :named-contact="contact" @sendtocontact="sendToContact" style="margin-top: 10%;" :user="user" :is="selectedView"></component>
+            </div>
+          </div>
+        </div>
+    </div>
+    <script>
+      new Vue({
+        el: '#main',
+        data: {
+          selectedView: 'contact-list',
+          user: {},
+          logout: true,
+          contactList: false,
+          emailForm: true,
+          contact: ''
+        },
+        methods: {
+          loadComponent(component) {
+            this.selectedView = component;
+            this.fetchUser();
+            if(component === "email-form") {
+            this.contactList = true;
+            this.emailForm = false;
+            } else {
+              this.contactList = false;
+              this.emailForm = true;
+            }
+          },
+          async fetchUser(){
+            let user = await axios.get('/fetchUser');
+            this.user = user.data;
+          },
+          sendToContact(contact) {
+            this.selectedView = 'email-form';
+            this.contact = contact;
+            this.emailForm = false;
+            this.contactList = true;
+          }
+        },
+        created() {
+          this.fetchUser();
+        }
+      });
+    </script>
+  </body>
+</html>

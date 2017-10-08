@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>Emailer</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="https://unpkg.com/jquery@3.2.1/dist/jquery.js"></script>
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="https://unpkg.com/vue"></script>
+    <script src="js/index.js"></script>
+    <script src="components/navbar.js"></script>
+    <script src="components/login.js"></script>
+    <script src="components/register.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.16.2/axios.min.js"></script>
+  </head>
+  <body>
+    <div id="main">
+        <navbar :logout="logout"></navbar>
+        <div class="container">
+          <div class="row">
+            <div class="col s6 offset-s3">
+                
+                <component @change="changeComponent" style="margin-top: 15vh" :is="selectedView"></component>
+            </div>
+          </div>
+        </div>
+    </div>
+    <script>
+      new Vue({
+        el: '#main',
+        data: {
+          selectedView: 'register',
+          logout: false
+        },
+        methods: {
+          changeComponent(component) {
+            this.selectedView = component.component;
+          }
+        }
+      });
+    </script>
+  </body>
+</html>
