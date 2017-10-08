@@ -30,6 +30,7 @@ Vue.component('register', {
         changeToLogin() {
             this.$emit('change',{component: 'login'});
         },
+        //send register info to Node
         async register() {
            let register = await axios.post('/register',{email: this.email, password: this.password});
            if(register.data.errors) {

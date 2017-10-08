@@ -7,7 +7,7 @@ let session =require('express-session');
 let mongoose = require('mongoose');
 const fileUpload = require('express-fileupload');
 const MongoStore = require('connect-mongo')(session);
-
+//set up middleware
 app.use(express.static(path.resolve(__dirname, 'client')));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));

@@ -8,14 +8,15 @@ let mailer = require("nodemailer");
 let config = JSON.parse(fs.readFileSync('././config.json'));
 let flatten = require('flat');
 let bcrypt = require('bcrypt');
-let authorizedUser = null;
 
+//connect to mlab
 try {
 mongoose.connect(`mongodb://${config.username}:${config.password}@${config.url}`)
 } catch(err) {
     console.log(err.message);
 }
 
+//send user to email form is logged in, else back to home page
 router.get('/', (req,res) => {
     if(req.session.user) {
         res.redirect('/emailForm');
@@ -24,6 +25,7 @@ router.get('/', (req,res) => {
 });
 
 router.post('/login', (req,res) => {
+    //encrypt user password
     let hash = bcrypt.hashSync(req.body.password, 10);
     let loggedInUser = new User({
         email: req.body.email,
@@ -33,8 +35,10 @@ router.post('/login', (req,res) => {
     
     let errors = checkUser(loggedInUser.email, loggedInUser.password);
     if(errors.length === 0) {
+        //check DB to confirm valid email/password combo
       User.findOne({email: loggedInUser.email}, (err, user) => {
             if(user && bcrypt.compareSync(loggedInUser.password, hash)) {
+                //if valid, start session and tell client side to take user to email form
                 req.session.user = user;
                 req.session.save(() => {
                     res.send({user});
@@ -50,6 +54,7 @@ router.post('/login', (req,res) => {
     else res.send({errors});
 });
 
+//check user is signed in
 router.get('/emailform', (req,res) => {
     if(req.session.user) {
       res.render('email');
@@ -58,6 +63,7 @@ router.get('/emailform', (req,res) => {
 });
 
 router.post('/emailForm', (req,res) => {
+    //check valid email info
     let errors = [];
     if(!validator.isEmail(req.body.email)) {
         errors.push("Invalid email");
@@ -82,7 +88,9 @@ router.post('/emailForm', (req,res) => {
            }
         });
         let files = [];
+        //check if files uploaded
         if(req.files) {
+        //flatten file object and extract file names and data
         let flattened = flatten(req.files);
         let data = Object.keys(flattened).filter(field => /\.name/.test(field) || /\.data/.test(field));
         for(let i = 0; i < data.length; i+=2) {
@@ -101,6 +109,7 @@ router.post('/emailForm', (req,res) => {
             if(error) {
                 res.send({error});
             } else {
+                //check if user's contact list already contains req.body.email
                 User.findOne({email: req.session.user.email}, (err,user) => {
                     let id = user._id;
                     for(let contact of user.contacts) {
@@ -110,6 +119,7 @@ router.post('/emailForm', (req,res) => {
                             return false;
                         }
                     }
+                    //add new contact to list and save
                     user.contacts.push(req.body.email);
                     user.isNew = false;
                     user.save((err,info) =>{
@@ -124,6 +134,7 @@ router.post('/emailForm', (req,res) => {
     }
 });
 
+//remove contact from user's contact list
 router.post('/deleteContact', (req,res) => {
    User.findOne({email: req.session.user.email, password: req.session.user.password}, (err,user) => {
        if(user) {
@@ -135,6 +146,7 @@ router.post('/deleteContact', (req,res) => {
    });
 });
 
+//retrieve all info for user
 router.get('/fetchUser', (req,res) => {
    if(req.session.user) {
        User.findOne({email: req.session.user.email, password: req.session.user.password}, (err, user) => {
@@ -145,6 +157,7 @@ router.get('/fetchUser', (req,res) => {
    } else res.send({error: "Not logged in"});
 });
 
+//destroy session and redirect
 router.post('/logout', (req,res) => {
     req.session.destroy(err => {
        if(err) {
@@ -153,8 +166,8 @@ router.post('/logout', (req,res) => {
     });
 });
 
+//check if user is already in database, if not save email and encrypted password 
 router.post('/register', (req,res) => {
-    console.log(req.body.password);
     res.setHeader('Access-Control-Allow-Credentials', 'true');
     let newUser = new User({
         email: req.body.email,
@@ -179,6 +192,7 @@ router.post('/register', (req,res) => {
     else res.send({errors});
 });
 
+//user email and password validation
 let checkUser = (email, password) => {
     let errors = [];
 

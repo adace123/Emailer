@@ -20,6 +20,7 @@ Vue.component('contactList',{
       sendEmailToContact(contact) {
           this.$emit('sendtocontact', contact);
       },
+      //remove contact from Vue contact list and send request to Node to delete it from database
       async deleteContact(contact) {
           if(confirm("Are you sure you want to delete this contact?")) {
               this.user.contacts.splice(this.user.contacts.indexOf(contact),1);

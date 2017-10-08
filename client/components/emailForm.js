@@ -56,6 +56,7 @@ Vue.component('emailForm', {
     },
     props: ['namedContact'],
     methods: {
+        //create FormData object to store all items in form, send via AJAX
         async sendEmail() {
             this.success = false;
             this.sending = true;
@@ -81,6 +82,7 @@ Vue.component('emailForm', {
            }
         },
         onFileChange(e) {
+            //add file to Vue file array
             this.attachments.push(e.target.files[0]);
             this.fileSize += e.target.files[0].size;
             document.querySelector('input[type=file]').value = null;

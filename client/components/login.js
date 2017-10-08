@@ -27,9 +27,11 @@ Vue.component('login', {
     </div>
     `,
     methods: {
+        //swtich to register component
         changeToRegister() {
             this.$emit('change',{component: 'register'});
         },
+        //send login info to Node
         async login() {
            let user = await axios.post('/login',{email: this.email, password: this.password});
            if(user.data.errors) {

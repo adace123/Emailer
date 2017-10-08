@@ -38,6 +38,7 @@
           contact: ''
         },
         methods: {
+          //switch between email form and contact list components
           loadComponent(component) {
             this.selectedView = component;
             this.fetchUser();
@@ -49,6 +50,7 @@
               this.emailForm = true;
             }
           },
+          //get user info
           async fetchUser(){
             let user = await axios.get('/fetchUser');
             this.user = user.data;
